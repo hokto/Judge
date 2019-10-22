@@ -4,6 +4,7 @@ require"fileutils"
 def Judge(targetNumber,file)
 fileName=file.split(".")
 errorMessage=""
+judgeResult=[]
 if(fileName[1]=="cpp")
 system("g++ -o #{fileName[0]}.exe #{fileName[0]}.cpp 2> Error.txt")
 File.open("Error.txt","r") do|file|
@@ -14,9 +15,11 @@ end
 if(errorMessage !="")
 	puts "Result:CE"
 	puts errorMessage
+    judgeResult[0]=[]
+    judgeResult[0][0],judgeResult[0][1]="CE",errorMesssage
 else
 	tleList=[]
-	File.open("#{targetNumber}testcase.txt",mode="rt"){|f|
+    File.open("../TestCase/#{targetNumber}testcase.txt",mode="rt"){|f|
 		idx=0
 		f.each_line(rs=""){|line|
 			input=line.chomp(rs="")
@@ -39,7 +42,7 @@ else
 		}
 	}
 	result=[]
-	File.open("#{targetNumber}result.txt",mode="rt"){|answerF|
+    File.open("../Result/#{targetNumber}result.txt",mode="rt"){|answerF|
 		answerF.each_line(rs=""){|answerLine|
 			result.push(answerLine.chomp(rs=""))
 		}
@@ -53,11 +56,14 @@ else
 				puts "#{idx+1}:TLE"
 				resultFlag=1
 				tleList.shift()
+                judgeResult.push("TLE")
 			elsif(result[idx]!=playerAns)
 				puts "#{idx+1}:WA"
 				resultFlag=2
+                judgeResult.push("WA")
 			else
 				puts "#{idx+1}:AC"
+                judgeResult.push("AC")
 			end
 			idx+=1
 		}
@@ -65,11 +71,15 @@ else
 	case resultFlag
 		when 0 then
 			puts "Result:AC"
+            judgeResult.push("AC")
 		when 1 then
 			puts "Result:TLE"
+            judgeResult.push("TLE")
 		when 2 then
 			puts "Result:WA"
+            judgeResult.push("WA")
 	end
 	FileUtils.rm("output.txt")
 end
+return judgeResult
 end

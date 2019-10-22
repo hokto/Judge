@@ -1,10 +1,13 @@
 require "em-websocket"
 require "pp"
 require "./judge"
-
+require "socket"
 connect=[]
 
-EM::WebSocket.start({:host => "192.168.0.24" ,:port => 9999}) do|ws_conn|
+ipAddress=Socket.getifaddrs.select{|x|
+  x.name=="en0" and x.addr.ipv4?
+}.first.addr.ip_address
+EM::WebSocket.start({:host => ipAddress ,:port => 9999}) do|ws_conn|
 		ws_conn.onopen do
 				connect<<ws_conn
 		end
@@ -14,8 +17,10 @@ EM::WebSocket.start({:host => "192.168.0.24" ,:port => 9999}) do|ws_conn|
           File.open(targetFile,"w") do|file|
             file.print(receiveFile[1])
           end
-          Thread.new{Judge(0,targetFile)}
-          p targetFile
-          ws_conn.send(message)
+          result=[]
+          Thread.new{
+            result=Judge(0,targetFile)
+            ws_conn.send(result.join(":"))
+          }
 		end
 end 
