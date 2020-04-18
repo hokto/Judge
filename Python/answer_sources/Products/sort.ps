@@ -1,0 +1,918 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 24 24 571 818
+%%Title: Enscript Output
+%%For: 片山北翔
+%%Creator: GNU Enscript 1.6.6
+%%CreationDate: Thu Mar  5 19:47:56 2020
+%%Orientation: Portrait
+%%Pages: (atend)
+%%DocumentMedia: A4 595 842 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 6
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/MF_PS { % fontname newfontname -> -	make a new font preserving its enc
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/SUF_PS { % fontname width height -> -	set a new user font preserving its enc
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF_PS
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+/bgcs { % x y height blskip red green blue str -> -  show string with bg color
+  /str exch def
+  /blue exch def
+  /green exch def
+  /red exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    red green blue setrgbcolor
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 6
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 10 10 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [595 842] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-simple 1.6 6
+
+/do_header {	% print default simple header
+  gsave
+    d_header_x d_header_y HFpt_h 3 div add translate
+
+    HF setfont
+    user_header_p {
+      5 0 moveto user_header_left_str show
+
+      d_header_w user_header_center_str stringwidth pop sub 2 div
+      0 moveto user_header_center_str show
+
+      d_header_w user_header_right_str stringwidth pop sub 5 sub
+      0 moveto user_header_right_str show
+    } {
+      5 0 moveto fname show
+      45 0 rmoveto fmodstr show
+      45 0 rmoveto pagenumstr show
+    } ifelse
+
+  grestore
+} def
+%%EndResource
+/d_page_w 547 def
+/d_page_h 794 def
+/d_header_x 0 def
+/d_header_y 779 def
+/d_header_w 547 def
+/d_header_h 15 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 547 def
+/d_footer_h 0 def
+/d_output_w 547 def
+/d_output_h 779 def
+/cols 1 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+24 24 translate
+/pagenum 1 def
+/fname (sort.cpp) def
+/fdir (.) def
+/ftail (sort.cpp) def
+% User defined strings:
+/fmodstr (Thu Mar 05 19:47:47 2020) def
+/pagenumstr (1) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+do_header
+30 766 M (1:) s
+48 766 M
+(#) s
+/Courier-Bold 10 10 SUF
+0.372549 0.619608 0.627451 setrgbcolor
+54 766 M
+(include<iostream>) s
+/F-gs-font 10 10 SF
+0 setgray
+30 755 M (2:) s
+48 755 M
+(#) s
+/Courier-Bold 10 10 SUF
+0.372549 0.619608 0.627451 setrgbcolor
+54 755 M
+(include<vector>) s
+/F-gs-font 10 10 SF
+0 setgray
+30 744 M (3:) s
+30 733 M (4:) s
+48 733 M
+(#) s
+/Courier-Bold 10 10 SUF
+0.372549 0.619608 0.627451 setrgbcolor
+54 733 M
+(define) s
+/F-gs-font 10 10 SF
+0 setgray
+90 733 M
+( ) s
+/Courier 10 10 SUF
+0.721569 0.52549 0.043137 setrgbcolor
+96 733 M
+(ll) s
+/F-gs-font 10 10 SF
+0 setgray
+108 733 M
+( long long int) s
+30 722 M (5:) s
+48 722 M
+(#) s
+/Courier-Bold 10 10 SUF
+0.372549 0.619608 0.627451 setrgbcolor
+54 722 M
+(define) s
+/F-gs-font 10 10 SF
+0 setgray
+90 722 M
+( ) s
+/Courier-Bold 10 10 SUF
+0 0 1 setrgbcolor
+96 722 M
+(rep) s
+/F-gs-font 10 10 SF
+0 setgray
+114 722 M
+(\(n\) for\(int i=0;i<n;i++\)) s
+30 711 M (6:) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+48 711 M
+(//\(1\)) s
+/F-gs-font 10 10 SF
+30 700 M (7:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+/Courier-Bold 10 10 SUF
+0.133333 0.545098 0.133333 setrgbcolor
+48 700 M
+(class) s
+/F-gs-font 10 10 SF
+0 setgray
+78 700 M
+( BIT) s
+30 689 M (8:) s
+48 689 M
+({) s
+30 678 M (9:) s
+48 678 M
+(  ) s
+/Courier-Bold 10 10 SUF
+0.133333 0.545098 0.133333 setrgbcolor
+60 678 M
+(public) s
+/F-gs-font 10 10 SF
+0 setgray
+96 678 M
+(:) s
+24 667 M (10:) s
+48 667 M
+(    ) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+72 667 M
+(//\(2\)) s
+/F-gs-font 10 10 SF
+24 656 M (11:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+48 656 M
+(    ) s
+/Courier-Bold 10 10 SUF
+0.372549 0.619608 0.627451 setrgbcolor
+72 656 M
+(std) s
+/F-gs-font 10 10 SF
+0 setgray
+90 656 M
+(::vector<ll> node;) s
+24 645 M (12:) s
+48 645 M
+(    ll n_;) s
+24 634 M (13:) s
+48 634 M
+(    BIT\(ll n\)) s
+24 623 M (14:) s
+48 623 M
+(    {) s
+24 612 M (15:) s
+48 612 M
+(      n_=n;) s
+24 601 M (16:) s
+48 601 M
+(      node.resize\(n+1,0\);) s
+24 590 M (17:) s
+48 590 M
+(    }) s
+24 579 M (18:) s
+24 568 M (19:) s
+48 568 M
+(    ) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+72 568 M
+(//\(3\)) s
+/F-gs-font 10 10 SF
+24 557 M (20:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+48 557 M
+(    ) s
+/Courier-Bold 10 10 SUF
+0.133333 0.545098 0.133333 setrgbcolor
+72 557 M
+(void) s
+/F-gs-font 10 10 SF
+0 setgray
+96 557 M
+( add\(ll i,ll x\)) s
+24 546 M (21:) s
+48 546 M
+(    {) s
+24 535 M (22:) s
+48 535 M
+(      ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+84 535 M
+(while) s
+/F-gs-font 10 10 SF
+0 setgray
+114 535 M
+(\(i<=n_\)) s
+24 524 M (23:) s
+48 524 M
+(      {) s
+24 513 M (24:) s
+48 513 M
+(        node[i]+=x;) s
+24 502 M (25:) s
+48 502 M
+(        i+=i&-i;) s
+24 491 M (26:) s
+48 491 M
+(      }) s
+24 480 M (27:) s
+48 480 M
+(    }) s
+24 469 M (28:) s
+24 458 M (29:) s
+48 458 M
+(    ) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+72 458 M
+(//\(4\)) s
+/F-gs-font 10 10 SF
+24 447 M (30:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+48 447 M
+(    ll sum\(ll i\)) s
+24 436 M (31:) s
+48 436 M
+(    {) s
+24 425 M (32:) s
+48 425 M
+(      ll s=0;) s
+24 414 M (33:) s
+48 414 M
+(      ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+84 414 M
+(while) s
+/F-gs-font 10 10 SF
+0 setgray
+114 414 M
+(\(i>0\)) s
+24 403 M (34:) s
+48 403 M
+(      {) s
+24 392 M (35:) s
+48 392 M
+(        s+=node[i];) s
+24 381 M (36:) s
+48 381 M
+(        i-=i&-i;) s
+24 370 M (37:) s
+48 370 M
+(      }) s
+24 359 M (38:) s
+48 359 M
+(      ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+84 359 M
+(return) s
+/F-gs-font 10 10 SF
+0 setgray
+120 359 M
+( s;) s
+24 348 M (39:) s
+48 348 M
+(    }) s
+24 337 M (40:) s
+48 337 M
+(};) s
+24 326 M (41:) s
+24 315 M (42:) s
+/Courier-Bold 10 10 SUF
+0.133333 0.545098 0.133333 setrgbcolor
+48 315 M
+(int) s
+/F-gs-font 10 10 SF
+0 setgray
+66 315 M
+( ) s
+/Courier-Bold 10 10 SUF
+0 0 1 setrgbcolor
+72 315 M
+(main) s
+/F-gs-font 10 10 SF
+0 setgray
+96 315 M
+(\(\)) s
+24 304 M (43:) s
+48 304 M
+({) s
+24 293 M (44:) s
+48 293 M
+(  ll n;) s
+24 282 M (45:) s
+48 282 M
+(  ) s
+/Courier-Bold 10 10 SUF
+0.372549 0.619608 0.627451 setrgbcolor
+60 282 M
+(std) s
+/F-gs-font 10 10 SF
+0 setgray
+78 282 M
+(::cin>>n;) s
+24 271 M (46:) s
+48 271 M
+(  ) s
+/Courier-Bold 10 10 SUF
+0.372549 0.619608 0.627451 setrgbcolor
+60 271 M
+(std) s
+/F-gs-font 10 10 SF
+0 setgray
+78 271 M
+(::vector<ll> v\(n\);) s
+24 260 M (47:) s
+48 260 M
+(  ) s
+/Courier-Bold 10 10 SUF
+0.372549 0.619608 0.627451 setrgbcolor
+60 260 M
+(std) s
+/F-gs-font 10 10 SF
+0 setgray
+78 260 M
+(::vector<ll> p\(n\);) s
+24 249 M (48:) s
+48 249 M
+(  BIT *bit_v=) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+126 249 M
+(new) s
+/F-gs-font 10 10 SF
+0 setgray
+144 249 M
+( BIT\(n\);) s
+24 238 M (49:) s
+48 238 M
+(  BIT *bit_p=) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+126 238 M
+(new) s
+/F-gs-font 10 10 SF
+0 setgray
+144 238 M
+( BIT\(n\);  ) s
+24 227 M (50:) s
+48 227 M
+(  ll cnt_v=0;) s
+24 216 M (51:) s
+48 216 M
+(  ll cnt_p=0;) s
+24 205 M (52:) s
+48 205 M
+(  ) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+60 205 M
+(//\(5\)) s
+/F-gs-font 10 10 SF
+24 194 M (53:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+48 194 M
+(  rep\(n\)) s
+24 183 M (54:) s
+48 183 M
+(  {) s
+24 172 M (55:) s
+48 172 M
+(    ) s
+/Courier-Bold 10 10 SUF
+0.133333 0.545098 0.133333 setrgbcolor
+72 172 M
+(int) s
+/F-gs-font 10 10 SF
+0 setgray
+90 172 M
+( v;) s
+24 161 M (56:) s
+48 161 M
+(    ) s
+/Courier-Bold 10 10 SUF
+0.372549 0.619608 0.627451 setrgbcolor
+72 161 M
+(std) s
+/F-gs-font 10 10 SF
+0 setgray
+90 161 M
+(::cin>>v;) s
+24 150 M (57:) s
+48 150 M
+(    cnt_v+=i-bit_v->sum\(v\);) s
+24 139 M (58:) s
+48 139 M
+(    bit_v->add\(v,1\);) s
+24 128 M (59:) s
+48 128 M
+(  }) s
+24 117 M (60:) s
+48 117 M
+(  ) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+60 117 M
+(//\(6\)) s
+/F-gs-font 10 10 SF
+24 106 M (61:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+48 106 M
+(  rep\(n\)) s
+24 95 M (62:) s
+48 95 M
+(  {) s
+24 84 M (63:) s
+48 84 M
+(    ) s
+/Courier-Bold 10 10 SUF
+0.133333 0.545098 0.133333 setrgbcolor
+72 84 M
+(int) s
+/F-gs-font 10 10 SF
+0 setgray
+90 84 M
+( p;) s
+24 73 M (64:) s
+48 73 M
+(    ) s
+/Courier-Bold 10 10 SUF
+0.372549 0.619608 0.627451 setrgbcolor
+72 73 M
+(std) s
+/F-gs-font 10 10 SF
+0 setgray
+90 73 M
+(::cin>>p;) s
+24 62 M (65:) s
+48 62 M
+(    cnt_p+=i-bit_p->sum\(p\);) s
+24 51 M (66:) s
+48 51 M
+(    bit_p->add\(p,1\);) s
+24 40 M (67:) s
+48 40 M
+(  }) s
+24 29 M (68:) s
+48 29 M
+(  ) s
+/Courier-Bold 10 10 SUF
+0.372549 0.619608 0.627451 setrgbcolor
+60 29 M
+(std) s
+/F-gs-font 10 10 SF
+0 setgray
+78 29 M
+(::cout<<cnt_v-cnt_p<<std::endl;) s
+24 18 M (69:) s
+48 18 M
+(  ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+60 18 M
+(return) s
+/F-gs-font 10 10 SF
+0 setgray
+96 18 M
+( 0;) s
+24 7 M (70:) s
+48 7 M
+(}) s
+_R
+S
+%%Trailer
+%%Pages: 1
+%%DocumentNeededResources: font Courier-Oblique Courier-Bold Courier 
+%%EOF

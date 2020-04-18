@@ -1,9 +1,8 @@
 $(function(){
-    var ws = new WebSocket('ws://192.168.0.20:9999/'); 
-	var sendText=null;
+    var ws = new WebSocket('ws://192.168.11.17:9999/'); 
+    var sendText=null;
     var reader=new FileReader();
-    var sendFile=document.getElementById("selectFile");
-    var type=null;
+    var sendFile=document.getElementById("selectFile"); var type=null;
     var name=null;
       function fileChange(e){
               var target=e.target;
