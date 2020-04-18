@@ -32,7 +32,7 @@ def decision(cmd=None,input_="",correct_output=""):
     except subprocess.TimeoutExpired:
         return 2
     
-def run_cpp(object_file_name="",testcase_inputs=None,correct_outputs=None):
+def run_cpp(object_file_name="",testcase_inputs=None,correct_outputs=None,allotment=None):
     ac,wa,tle,re,ce=[0]*5
     run_number=len(testcase_inputs)
     cmd_compile=["g++",object_file_name,"-o","main.out"]
@@ -40,75 +40,90 @@ def run_cpp(object_file_name="",testcase_inputs=None,correct_outputs=None):
                                            stdout=subprocess.PIPE,
                                            stderr=subprocess.STDOUT) 
     status_compile,error_b=process_res.returncode,process_res.stdout
+    point=0
     #CEだった場合
     if status_compile==1:
         print("CE:",error_b.decode("utf8"))
         ce=run_number
-        return ac,wa,tle,re,ce
+        return ac,wa,tle,re,ce,point
     cmd_cpp=["./main.out"]
     for run_i in range(run_number):
         run_result=decision(cmd=cmd_cpp,input_=testcase_inputs[run_i],
                             correct_output=correct_outputs[run_i])
         if run_result==0:
             print(run_i,":AC")
+            point+=allotment[run_i]
             ac+=1
         elif run_result==1:
             print(run_i,":WA")
+            point=0
             wa+=1
         elif run_result==2:
             print(run_i,":TLE")
+            point=0
             tle+=1
         elif run_result==3:
             print(run_i,":RE")
+            point=0
             re+=1
-    return ac,wa,tle,re,ce
+    return ac,wa,tle,re,ce,point
 
 
-def run_ruby(object_file_name="",testcase_inputs=None,correct_outputs=None):
+def run_ruby(object_file_name="",testcase_inputs=None,correct_outputs=None,allotment=None):
     ac,wa,tle,re,ce=[0]*5
     run_number=len(testcase_inputs)
     cmd_rb=["ruby",object_file_name]
+    point=0
     for run_i in range(run_number):
         run_result=decision(cmd=cmd_rb,input_=testcase_inputs[run_i],
                             correct_output=correct_outputs[run_i])        
         if run_result==0:
             print(run_i,":AC")
+            point+=allotment[run_i]
             ac+=1
         elif run_result==1:
             print(run_i,":WA")
+            point=0
             wa+=1
         elif run_result==2:
             print(run_i,":TLE")
+            point=0
             tle+=1
         elif run_result==3:
             print(run_i,":RE")
+            point=0
             re+=1
-    return ac,wa,tle,re,ce
+    return ac,wa,tle,re,ce,point
 
 
-def run_python(object_file_name="",testcase_inputs=None,correct_outputs=None):
+def run_python(object_file_name="",testcase_inputs=None,correct_outputs=None,allotment=None):
     ac,wa,tle,re,ce=[0]*5
     run_number=len(testcase_inputs)
     cmd_py=["python3",object_file_name]
+    point=0
     for run_i in range(run_number):
         run_result=decision(cmd=cmd_py,input=testcase_inputs[run_i],
                             correct_output=correct_outputs[run_i])        
         if run_result==0:
             print(run_i,":AC")
+            point+=allotment[run_i]
             ac+=1
         elif run_result==1:
             print(run_i,":WA")
+            point=0
             wa+=1
         elif run_result==2:
             print(run_i,":TLE")
+            point=0
             tle+=1
         elif run_result==3:
             print(run_i,":RE")
+            point=0
             re+=1
-    return ac,wa,tle,re,ce
+    return ac,wa,tle,re,ce,point
 
 
-def run(object_file_name="",testcase_inputs=None,correct_outputs=None):
+def run(object_file_name="",testcase_inputs=None,correct_outputs=None,allotment=None):
     #テストケースと正解出力ファイルの数が同じでなければ実行させない
     if len(testcase_inputs)!=len(correct_outputs):
         print("Size Error:\nTestCase's size is ",len(testcase_inputs),"but",
@@ -120,14 +135,14 @@ def run(object_file_name="",testcase_inputs=None,correct_outputs=None):
     ac,wa,tle,re,ce=[0]*5
     #ジャッジする言語が増えればここに関数の追加
     if extension=="cpp":
-        ac,wa,tle,re,ce=run_cpp(object_file_name,testcase_inputs,
-                                correct_outputs)
+        ac,wa,tle,re,ce,point=run_cpp(object_file_name,testcase_inputs,
+                                correct_outputs,allotment)
     elif extension=="rb":
-        ac,wa,tle,re,ce=run_ruby(object_file_name,testcase_inputs,
-                                correct_outputs)
+        ac,wa,tle,re,ce,point=run_ruby(object_file_name,testcase_inputs,
+                                correct_outputs,allotment)
     elif extension=="py":
-        ac,wa,tle,re,ce=run_python(object_file_name,testcase_inputs,
-                                    correct_outputs)
+        ac,wa,tle,re,ce,point=run_python(object_file_name,testcase_inputs,
+                                    correct_outputs,allotment)
     
     #最終結果を優先度順を考慮して分岐
     print("Result:",end="")
@@ -141,6 +156,7 @@ def run(object_file_name="",testcase_inputs=None,correct_outputs=None):
         print("RE")
     else:
         print("AC")
+    print("Point:",point)
     return ac,wa,tle,re,ce
 
 if __name__=="__main__":
@@ -148,6 +164,15 @@ if __name__=="__main__":
     decision_name=input()
     print("Input judged source name")
     file_name=input()
+    print("Input point of judged file name")
+    allotment_file_name=input()
+    #各テストケースの得点は、別ファイルで保存
+    allotment=file_accessor.read(file_name="./Allotment/"+str(allotment_file_name)+".txt",
+                        separate_word="\n")
+    if allotment==[]:
+        print("FileError:\nAllotment file does not find")
+        exit()
+    allotment=list(map(int,allotment))
     #区切り文字はまだ未決定なので仮置き
     testcases=file_accessor.read(file_name="./TestCase/"+str(decision_name)+".txt",
                         separate_word="/\n")
@@ -162,6 +187,6 @@ if __name__=="__main__":
         print("FileError:\nCorrectOutPut file does not find")
         exit()
     ac,wa,tle,re,ce=run(object_file_name=file_name,testcase_inputs=testcases,
-                        correct_outputs=correct_outputs)
+                        correct_outputs=correct_outputs,allotment=allotment)
     print(ac,wa,tle,re,ce)
 
