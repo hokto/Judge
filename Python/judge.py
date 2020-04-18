@@ -52,19 +52,17 @@ def run_cpp(object_file_name="",testcase_inputs=None,correct_outputs=None,allotm
                             correct_output=correct_outputs[run_i])
         if run_result==0:
             print(run_i,":AC")
-            point+=allotment[run_i]
+            if wa==0 and tle==0 and re==0:
+                point+=allotment[run_i]
             ac+=1
         elif run_result==1:
             print(run_i,":WA")
-            point=0
             wa+=1
         elif run_result==2:
             print(run_i,":TLE")
-            point=0
             tle+=1
         elif run_result==3:
             print(run_i,":RE")
-            point=0
             re+=1
     return ac,wa,tle,re,ce,point
 
@@ -79,19 +77,17 @@ def run_ruby(object_file_name="",testcase_inputs=None,correct_outputs=None,allot
                             correct_output=correct_outputs[run_i])        
         if run_result==0:
             print(run_i,":AC")
-            point+=allotment[run_i]
+            if wa==0 and tle==0 and re==0:
+                point+=allotment[run_i]
             ac+=1
         elif run_result==1:
             print(run_i,":WA")
-            point=0
             wa+=1
         elif run_result==2:
             print(run_i,":TLE")
-            point=0
             tle+=1
         elif run_result==3:
             print(run_i,":RE")
-            point=0
             re+=1
     return ac,wa,tle,re,ce,point
 
@@ -106,19 +102,17 @@ def run_python(object_file_name="",testcase_inputs=None,correct_outputs=None,all
                             correct_output=correct_outputs[run_i])        
         if run_result==0:
             print(run_i,":AC")
-            point+=allotment[run_i]
+            if wa==0 and tle==0 and re==0:
+                point+=allotment[run_i]
             ac+=1
         elif run_result==1:
             print(run_i,":WA")
-            point=0
             wa+=1
         elif run_result==2:
             print(run_i,":TLE")
-            point=0
             tle+=1
         elif run_result==3:
             print(run_i,":RE")
-            point=0
             re+=1
     return ac,wa,tle,re,ce,point
 
