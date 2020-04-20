@@ -1,6 +1,31 @@
 import file_accessor
 import subprocess
+import re
 
+
+def is_unadulterated_match(output=None,correct_output=None):
+    #ACだった場合
+    if output==correct_output:
+        return 0
+    #WAだった場合
+    else:
+        return 1
+
+def is_permissible_error(output=None,correct_output=None):
+    #誤差の計算処理
+    #正規表現を用いて必要な情報を抽出
+    #例:10+err(-5) <= (10-1e-5 <= X <= 10+1e-5)を満たすXが範囲内誤差
+    error_str=re.findall(r"\+err\([\+\-]\d+\)",correct_output)[0]
+    error_int=int(re.findall(r"[\+\-]\d+",error_str)[0])
+    criterion=float(re.sub(r"(\+err\([\+\-]\d+\))","",correct_output))
+    permissible_error_min=criterion-10**error_int
+    permissible_error_max=criterion+10**error_int
+    output_float=float(output)
+    #許容誤差範囲内ならばAC
+    if permissible_error_min<=output_float<=permissible_error_max:
+        return 0
+    else:
+        return 1
 def decision(cmd=None,input_="",correct_output=""):
     try:
         process_res=subprocess.run(args=cmd,input=input_,cwd="./",shell=False,
@@ -22,12 +47,11 @@ def decision(cmd=None,input_="",correct_output=""):
         if status==1:
             return 3
 
-        #ACだった場合
-        if output==correct_output:
-            return 0
-        #WAだった場合
+        #誤差を許容するテストケースの場合、判定方法を変える
+        if re.fullmatch(r'.+\+err\([\+\-]\d+\)\n',correct_output) is not None:
+            return is_permissible_error(output,correct_output)
         else:
-            return 1
+            return is_unadulterated_match(output,correct_output)
     #TLE(制限時間2sec)だった場合
     except subprocess.TimeoutExpired:
         return 2
