@@ -2,6 +2,15 @@ import file_accessor
 import subprocess
 
 
+def modification(output_split=None,separate_word="",error_index=""):
+    output_number=len(output_split)
+    for output_i in range(output_number):
+        output=output_split[output_i]
+        output=list(output)
+        if int(error_index)!=0:
+            output.append("+err("+error_index+")")
+        output_split[output_i]="".join(output)
+    return separate_word.join(output_split)
 def run(cmd=None,testcase_inputs=None,outputs_name="",error_index=""):
     run_number=len(testcase_inputs)
     outputs=list()
@@ -17,15 +26,24 @@ def run(cmd=None,testcase_inputs=None,outputs_name="",error_index=""):
                 return -1
             output=list(run_process.stdout)
             #許容誤差を含むテストケースのフォーマットに合わせて出力を行う 
-            #ただし、単体の出力に対応(空白区切りのものなどには未対応)
-            if int(error_index)!=0:
-                if output[-1]=="\n":
-                    output.pop(-1)
-                if output[-1]==" ":
-                    output.pop(-1)
-                output.append("+err("+error_index+")")
-                output.append("\n")
+            if output[-1]=="\n":
+                output.pop(-1)
+            if output[-1]==" ":
+                output.pop(-1)
             output="".join(output)
+            output_split=None
+            if " " in output:
+                output_split=output.split(" ")
+                output_split=list(modification(output_split," ",error_index))
+            elif "\n" in output:
+                output_split=output.split("\n")
+                output_split=list(modification(output_split,"\n",error_index))
+            else:
+                output_split=list(output)
+                if int(error_index)!=0:
+                    output_split.append("+err("+error_index+")")
+            output_split.append("\n")
+            output="".join(output_split)
             outputs.append(output)
         except subprocess.TimeoutExpired:
             print("TLE in "+str(run_i)+":Confirmation testcase or source")
