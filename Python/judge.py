@@ -36,22 +36,55 @@ def decision(cmd=None,input_="",correct_output=""):
         #改行前に余計な空白があった場合は、削除
         #(正解用出力、判定する出力どちらにも対応させている)
         output_split=list(output)
-        if output_split[-2]==" ":
-            output_split.pop(-2)
+        if output_split[-1]=="\n":
+            output_split.pop(-1)
+        if output_split[-1]==" ":
+            output_split.pop(-1)
         output="".join(output_split)
         correct_output_split=list(correct_output)
-        if correct_output_split[-2]=="":
-            correct_output.pop(-2)
+        if correct_output_split[-1]=="\n":
+            correct_output_split.pop(-1)
+        if correct_output_split[-1]==" ":
+            correct_output_split.pop(-1)
         correct_output="".join(correct_output_split)
         #REだった場合
         if status==1:
             return 3
-
-        #誤差を許容するテストケースの場合、判定方法を変える
-        if re.fullmatch(r'.+\+err\([\+\-]\d+\)\n',correct_output) is not None:
-            return is_permissible_error(output,correct_output)
+        separate_word=None
+        if " " in correct_output:
+            correct_output=correct_output.split(" ")
+            separate_word=" "
+        elif "\n" in correct_output:
+            correct_output=correct_output.split("\n")
+            separate_word="\n"
+        #１つの出力のみと判断して単体のジャッジを行う
+        if separate_word is None:
+            #誤差を許容するテストケースの場合、判定方法を変える
+            if re.fullmatch(r'.+\+err\([\+\-]\d+\)',correct_output) is not None:
+                return is_permissible_error(output,correct_output)
+            else:
+                return is_unadulterated_match(output,correct_output)
         else:
-            return is_unadulterated_match(output,correct_output)
+        #複数ある場合は、それぞれでジャッジを行う
+            correct_output_number=len(correct_output)
+            output=output.split(separate_word)
+            if correct_output_number!=len(output):
+                return 1
+            else:
+                judge_result=-1
+                for output_i in range(correct_output_number):
+                    #誤差を許容するテストケースの場合、判定方法を変える
+                    if re.fullmatch(r'.+\+err\([\+\-]\d+\)',correct_output[output_i])\
+                            is not None:
+                        judge_result=is_permissible_error(output[output_i],
+                                                        correct_output[output_i])
+                    else:
+                        judge_result=is_unadulterated_match(output[output_i],
+                                                        correct_output[output_i])
+                    #どれか１つでもWAならばその時点で結果はWAとなる
+                    if judge_result==1:
+                        return 1
+                return 0
     #TLE(制限時間2sec)だった場合
     except subprocess.TimeoutExpired:
         return 2
