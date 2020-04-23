@@ -172,7 +172,7 @@ def run_python(object_file_name="",testcase_inputs=None,correct_outputs=None,all
     cmd_py=["python3",object_file_name]
     point=0
     for run_i in range(run_number):
-        run_result=decision(cmd=cmd_py,input=testcase_inputs[run_i],
+        run_result=decision(cmd=cmd_py,input_=testcase_inputs[run_i],
                             correct_output=correct_outputs[run_i])        
         if run_result==0:
             print(run_i,":AC")
