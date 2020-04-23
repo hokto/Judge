@@ -1,0 +1,9 @@
+judgecommand(python3 /Users/hokto/Desktop/JudgeSystem/Python/JudgeProgram/rearrange.py)
+/
+judgecommand(python3 /Users/hokto/Desktop/JudgeSystem/Python/JudgeProgram/rearrange.py)
+/
+judgecommand(python3 /Users/hokto/Desktop/JudgeSystem/Python/JudgeProgram/rearrange.py)
+/
+judgecommand(python3 /Users/hokto/Desktop/JudgeSystem/Python/JudgeProgram/rearrange.py)
+/
+judgecommand(python3 /Users/hokto/Desktop/JudgeSystem/Python/JudgeProgram/rearrange.py)

@@ -26,6 +26,19 @@ def is_permissible_error(output=None,correct_output=None):
         return 0
     else:
         return 1
+
+def is_alternative_match(input_="",output="",judgecommand=""):
+    cmd=re.sub(r"judgecommand\(|\)","",judgecommand)
+    cmd_split=cmd.split(" ")
+    process_res=subprocess.run(args=cmd_split,input=input_+output,cwd="./",shell=False,
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.STDOUT,text=True)
+    status,output=process_res.returncode,process_res.stdout
+    #ジャッジするプログラムでエラーが吐かれるなら提出コードが間違いであると判断
+    if status==1:
+        return 1
+    #ジャッジするプログラムが1(WA)か0(AC)を出力するのでそれを返す
+    return int(output)
 def decision(cmd=None,input_="",correct_output=""):
     try:
         process_res=subprocess.run(args=cmd,input=input_,cwd="./",shell=False,
@@ -50,6 +63,10 @@ def decision(cmd=None,input_="",correct_output=""):
         #REだった場合
         if status==1:
             return 3
+
+        #ここで処理しないとのちの処理で文字列が分割される
+        if re.fullmatch(r'judgecommand\(.+\)', correct_output) is not None:
+            return is_alternative_match(input_,output,correct_output)
         separate_word=None
         if " " in correct_output:
             correct_output=correct_output.split(" ")
