@@ -115,80 +115,89 @@ def run_cpp(object_file_name="",testcase_inputs=None,correct_outputs=None,allotm
                                            stderr=subprocess.STDOUT) 
     status_compile,error_b=process_res.returncode,process_res.stdout
     point=0
+    #結果をまとめて返す
+    res=""
     #CEだった場合
     if status_compile==1:
-        print("CE:",error_b.decode("utf8"))
+        res+="CE:"+error_b.decode("utf8")
         ce=run_number
-        return ac,wa,tle,re,ce,point
+        return ac,wa,tle,re,ce,point,res
     cmd_cpp=["./main.out"]
     for run_i in range(run_number):
         run_result=decision(cmd=cmd_cpp,input_=testcase_inputs[run_i],
                             correct_output=correct_outputs[run_i])
         if run_result==0:
-            print(run_i,":AC")
+            res+=str(run_i)+":AC"
             if wa==0 and tle==0 and re==0:
                 point+=allotment[run_i]
             ac+=1
         elif run_result==1:
-            print(run_i,":WA")
+            res+=str(run_i)+":WA"
             wa+=1
         elif run_result==2:
-            print(run_i,":TLE")
+            res+=str(run_i)+":TLE"
             tle+=1
         elif run_result==3:
-            print(run_i,":RE")
+            res+=str(run_i)+":RE"
             re+=1
-    return ac,wa,tle,re,ce,point
+        res+="\n"
+    return ac,wa,tle,re,ce,point,res
 
 
 def run_ruby(object_file_name="",testcase_inputs=None,correct_outputs=None,allotment=None):
     ac,wa,tle,re,ce=[0]*5
     run_number=len(testcase_inputs)
     cmd_rb=["ruby",object_file_name]
+    #結果をまとめて返す
+    res=""
     point=0
     for run_i in range(run_number):
         run_result=decision(cmd=cmd_rb,input_=testcase_inputs[run_i],
                             correct_output=correct_outputs[run_i])        
         if run_result==0:
-            print(run_i,":AC")
+            res+=str(run_i)+":AC"
             if wa==0 and tle==0 and re==0:
                 point+=allotment[run_i]
             ac+=1
         elif run_result==1:
-            print(run_i,":WA")
+            res+=str(run_i)+":WA"
             wa+=1
         elif run_result==2:
-            print(run_i,":TLE")
+            res+=str(run_i)+":TLE"
             tle+=1
         elif run_result==3:
-            print(run_i,":RE")
+            res+=str(run_i)+":RE"
             re+=1
-    return ac,wa,tle,re,ce,point
+        res+="\n"
+    return ac,wa,tle,re,ce,point,res
 
 
 def run_python(object_file_name="",testcase_inputs=None,correct_outputs=None,allotment=None):
     ac,wa,tle,re,ce=[0]*5
     run_number=len(testcase_inputs)
     cmd_py=["python3",object_file_name]
+    #結果をまとめて返す
+    res=""
     point=0
     for run_i in range(run_number):
         run_result=decision(cmd=cmd_py,input_=testcase_inputs[run_i],
                             correct_output=correct_outputs[run_i])        
         if run_result==0:
-            print(run_i,":AC")
+            res+=str(run_i)+":AC"
             if wa==0 and tle==0 and re==0:
                 point+=allotment[run_i]
             ac+=1
         elif run_result==1:
-            print(run_i,":WA")
+            res+=str(run_i)+":WA"
             wa+=1
         elif run_result==2:
-            print(run_i,":TLE")
+            res+=str(run_i)+":TLE"
             tle+=1
         elif run_result==3:
-            print(run_i,":RE")
+            res+=str(run_i)+":RE"
             re+=1
-    return ac,wa,tle,re,ce,point
+        res+="\n"
+    return ac,wa,tle,re,ce,point,res
 
 
 def run(object_file_name="",testcase_inputs=None,correct_outputs=None,allotment=None):
@@ -200,32 +209,34 @@ def run(object_file_name="",testcase_inputs=None,correct_outputs=None,allotment=
         return [-1]*5
     #拡張子だけ取り出したいから右から分割
     extension=object_file_name.rsplit(".",1)[1]
+    res=""
     ac,wa,tle,re,ce=[0]*5
     #ジャッジする言語が増えればここに関数の追加
     if extension=="cpp":
-        ac,wa,tle,re,ce,point=run_cpp(object_file_name,testcase_inputs,
+        ac,wa,tle,re,ce,point,res=run_cpp(object_file_name,testcase_inputs,
                                 correct_outputs,allotment)
     elif extension=="rb":
-        ac,wa,tle,re,ce,point=run_ruby(object_file_name,testcase_inputs,
+        ac,wa,tle,re,ce,point,res=run_ruby(object_file_name,testcase_inputs,
                                 correct_outputs,allotment)
     elif extension=="py":
-        ac,wa,tle,re,ce,point=run_python(object_file_name,testcase_inputs,
+        ac,wa,tle,re,ce,point,res=run_python(object_file_name,testcase_inputs,
                                     correct_outputs,allotment)
     
     #最終結果を優先度順を考慮して分岐
-    print("Result:",end="")
+    res+="Result:"
     if ce!=0:
-        print("CE")
+        res+="CE"
     elif wa!=0:
-        print("WA")
+        res+="WA"
     elif tle!=0:
-        print("TLE")
+        res+="TLE"
     elif re!=0:
-        print("RE")
+        res+="RE"
     else:
-        print("AC")
-    print("Point:",point)
-    return ac,wa,tle,re,ce
+        res+="AC"
+    res+="\n"
+    res+="Point:"+str(point)
+    return ac,wa,tle,re,ce,res
 
 if __name__=="__main__":
     print("Input decision name")
@@ -254,7 +265,8 @@ if __name__=="__main__":
     if correct_outputs==[]:
         print("FileError:\nCorrectOutPut file does not find")
         exit()
-    ac,wa,tle,re,ce=run(object_file_name=file_name,testcase_inputs=testcases,
+    ac,wa,tle,re,ce,res=run(object_file_name=file_name,testcase_inputs=testcases,
                         correct_outputs=correct_outputs,allotment=allotment)
-    print(ac,wa,tle,re,ce)
+    print(res)
+    #print(ac,wa,tle,re,ce)
 
