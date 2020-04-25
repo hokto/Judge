@@ -206,7 +206,7 @@ def run(object_file_name="",testcase_inputs=None,correct_outputs=None,allotment=
         print("Size Error:\nTestCase's size is ",len(testcase_inputs),"but",
             "CorrectOutPut's size is ",len(correct_outputs),".\n"
             +"Please check TestCase file and CorrectOutPut file.")
-        return [-1]*5
+        return [-1]*5,""
     #拡張子だけ取り出したいから右から分割
     extension=object_file_name.rsplit(".",1)[1]
     res=""
