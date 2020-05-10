@@ -1,5 +1,5 @@
 import random as rd
-MAX_N=100
+MAX_N=30
 MAX_L=50
 output=""
 for i in range(27):

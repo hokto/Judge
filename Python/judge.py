@@ -21,7 +21,7 @@ def is_permissible_error(output=None,correct_output=None):
     permissible_error_min=criterion-10**error_int
     permissible_error_max=criterion+10**error_int
     output_float=float(output)
-    #許容誤差範囲内ならばAC
+    #許容誤差範囲内ならばAC 
     if permissible_error_min<=output_float<=permissible_error_max:
         return 0
     else:
@@ -106,6 +106,34 @@ def decision(cmd=None,input_="",correct_output=""):
     except subprocess.TimeoutExpired:
         return 2
     
+def run_d(object_file_name="",testcase_inputs=None,correct_outputs=None,allotment=None):
+    ac,wa,tle,re,ce=[0]*5
+    run_number=len(testcase_inputs)
+    #D言語を使ったことがないので、とりあえずrdmdにしておく
+    cmd_rb=["rdmd",object_file_name]
+    #結果をまとめて返す
+    res=""
+    point=0
+    for run_i in range(run_number):
+        run_result=decision(cmd=cmd_rb,input_=testcase_inputs[run_i],
+                            correct_output=correct_outputs[run_i])        
+        if run_result==0:
+            res+=str(run_i)+":AC"
+            if wa==0 and tle==0 and re==0:
+                point+=allotment[run_i]
+            ac+=1
+        elif run_result==1:
+            res+=str(run_i)+":WA"
+            wa+=1
+        elif run_result==2:
+            res+=str(run_i)+":TLE"
+            tle+=1
+        elif run_result==3:
+            res+=str(run_i)+":RE"
+            re+=1
+        res+="\n"
+    return ac,wa,tle,re,ce,point,res
+
 def run_cpp(object_file_name="",testcase_inputs=None,correct_outputs=None,allotment=None):
     ac,wa,tle,re,ce=[0]*5
     run_number=len(testcase_inputs)
@@ -220,6 +248,9 @@ def run(object_file_name="",testcase_inputs=None,correct_outputs=None,allotment=
                                 correct_outputs,allotment)
     elif extension=="py":
         ac,wa,tle,re,ce,point,res=run_python(object_file_name,testcase_inputs,
+                                    correct_outputs,allotment)
+    elif extension=="d":
+        ac,wa,tle,re,ce,point,res=run_d(object_file_name,testcase_inputs,
                                     correct_outputs,allotment)
     
     #最終結果を優先度順を考慮して分岐
